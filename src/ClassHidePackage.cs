@@ -1,4 +1,5 @@
 ﻿using Community.VisualStudio.Toolkit;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.Runtime.InteropServices;
@@ -28,6 +29,12 @@ namespace ClassHide
     [Guid(ClassHidePackage.PackageGuidString)]
     [ProvideOptionPage(typeof(OptionsProvider.GeneralOptions), "Class Hide", "General", 0, 0, true, SupportsProfiles = true)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
+    [InstalledProductRegistration(Vsix.Name, Vsix.Description, Vsix.Version)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExists_string, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.DesignMode_string, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionHasMultipleProjects_string, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionHasSingleProject_string, PackageAutoLoadFlags.BackgroundLoad)]
     public sealed class ClassHidePackage : AsyncPackage
     {
         /// <summary>

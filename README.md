@@ -9,13 +9,13 @@ Download from the [Visual Studio Marketplace](https://marketplace.visualstudio.c
 
 ## Collapse Classes
 
-![Class hide](art/class-hide.gif)
+![Class hide](https://raw.githubusercontent.com/theron-wang/Class-Hide/main/art/class-hide.gif)
 
 Instantly hide all class attributes by using Ctrl+R, Ctrl+H or by clicking **Collapse All Classes** under the Tools menu.
 
 ## Settings
 
-![Settings](art/settings.png)
+![Settings](https://raw.githubusercontent.com/theron-wang/Class-Hide/main/art/settings.png)
 
 Extension settings can be located under Tools > Options > Class Hide.
 
