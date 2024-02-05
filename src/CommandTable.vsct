@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	
+	<Extern href="stdidcmd.h"/>
+	<Extern href="vsshlids.h"/>
+	<Include href="KnownImageIds.vsct" />
+	
+	<Commands package="guidVSPackage">
+		<Buttons>
+			<Button guid="guidVSPackageCmdSet" id="CollapseAllCmdId" priority="0x0100" type="Button">
+				<Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLS_EXT_TOOLS" />
+				<Icon guid="ImageCatalogGuid" id="CollapseAll" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<CommandFlag>DynamicVisibility</CommandFlag>
+				<CommandFlag>DefaultInvisible</CommandFlag>
+				<Strings>
+					<ButtonText>Collapse All Classes</ButtonText>
+				</Strings>
+			</Button>
+		</Buttons>
+	</Commands>
+
+	<KeyBindings>
+		<KeyBinding guid="guidVSPackageCmdSet" id="CollapseAllCmdId" editor="guidVSStd97" key1="R" mod1="Control" key2="H" mod2="Control" />
+	</KeyBindings>
+	
+	<Symbols>
+		<GuidSymbol name="guidVSPackage" value="{b61984ec-1cec-4264-a4b3-bfe3f4b1bb1b}" />
+
+		<GuidSymbol name="guidVSPackageCmdSet" value="{9b24f905-69f7-446d-941a-427a2f4e0917}">
+			<IDSymbol name="CollapseAllCmdId" value="0x0100" />
+		</GuidSymbol>
+	</Symbols>
+</CommandTable>
