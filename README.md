@@ -1,6 +1,6 @@
 # Class Hide
 
-![Visual Studio Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/TheronWang.ClassHide)
+![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/TheronWang.ClassHide)
 ![Visual Studio Marketplace Version (including pre-releases)](https://img.shields.io/visual-studio-marketplace/v/TheronWang.ClassHide)
 
 This extension collapses lengthy HTML class attributes to increase code readability, especially when working with utility frameworks like Tailwind CSS. Say goodbye to file clutter and welcome a more streamlined coding experience.
