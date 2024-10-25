@@ -15,7 +15,7 @@ internal class Parser
     private readonly object _updateLock = new();
     private readonly ITextBuffer _buffer;
 
-    public List<SnapshotSpan> Regions { get; protected set; } = [];
+    public HashSet<SnapshotSpan> Regions { get; protected set; } = [];
 
     /// <summary>
     /// Sends an <see cref="IEnumerable{T}"/> of type <see cref="Span"/> of changed spans or null if the entire document was revalidated
@@ -164,7 +164,7 @@ internal class Parser
                 start -= 1;
             }
 
-            while (start > 0 && !searchFor.Contains(start.Snapshot.GetText(start, Math.Min(start.Snapshot.Length - start, 6)).ToLower()))
+            while (start > 0 && !searchFor.Contains(start.Snapshot.GetText(start, Math.Min(start.Snapshot.Length - start, 7)).ToLower()))
             {
                 start -= 1;
             }
@@ -184,7 +184,7 @@ internal class Parser
 
         var index = segmentEnd - span.Start;
 
-        while (text.IndexOf("class=\"", index) != -1 || text.IndexOf("class='", index) != -1)
+        while (index < text.Length && (text.IndexOf("class=\"", index) != -1 || text.IndexOf("class='", index) != -1))
         {
             doubleQuoteClass = text.IndexOf("class=\"", index, StringComparison.InvariantCultureIgnoreCase);
             singleQuoteClass = text.IndexOf("class='", index, StringComparison.InvariantCultureIgnoreCase);
@@ -200,7 +200,7 @@ internal class Parser
 
             char end;
 
-            if (doubleQuoteClass == segmentStart)
+            if (segmentStart == span.Start + doubleQuoteClass)
             {
                 end = '"';
             }
@@ -209,6 +209,7 @@ internal class Parser
                 end = '\'';
             }
 
+            // Exclude class="
             segmentStart += 7;
             segmentEnd = segmentStart + 1;
 
@@ -217,31 +218,29 @@ internal class Parser
             // Number of quotes (excluding \")
             // Odd if in string context, even if not
             int numberOfQuotes = 0;
-            bool isEscaping = false;
+            char lastChar = default;
 
             while (segmentEnd < span.End && segmentEnd + 1 < snapshot.Length)
             {
                 segmentEnd += 1;
-
                 var character = segmentEnd.GetChar();
 
                 if (character == '@')
                 {
+                    if (lastChar == '@')
+                    {
+                        isInRazor = false;
+                        continue;
+                    }
+
                     isInRazor = true;
                 }
-                else if (isInRazor)
-                {
-                    bool escape = isEscaping;
-                    isEscaping = false;
 
-                    if (numberOfQuotes % 2 == 1)
-                    {
-                        if (character == '\\')
-                        {
-                            isEscaping = true;
-                        }
-                    }
-                    else
+                if (isInRazor)
+                {
+                    bool escape = lastChar == '\\';
+
+                    if (numberOfQuotes % 2 == 0)
                     {
                         if (character == '(')
                         {
@@ -258,25 +257,31 @@ internal class Parser
                         numberOfQuotes++;
                     }
 
-                    if (depth == 0 && numberOfQuotes % 2 == 0 && character == ' ')
+                    if (depth == 0 && numberOfQuotes % 2 == 0 && char.IsWhiteSpace(character))
                     {
                         isInRazor = false;
                     }
+
+                    lastChar = character;
+                    continue;
                 }
 
-                if (end == segmentEnd.GetChar() && isInRazor == false)
+                if (end == character)
                 {
                     yield return new SnapshotSpan(segmentStart, segmentEnd);
+
+                    if (segmentEnd == span.End)
+                    {
+                        yield break;
+                    }
 
                     segmentStart = segmentEnd + 1;
                     break;
                 }
+
+                lastChar = character;
             }
 
-            if (segmentEnd >= span.End)
-            {
-                yield break;
-            }
             index = segmentEnd - span.Start;
         }
     }
@@ -303,7 +308,7 @@ internal class Parser
 
     private void ForceUpdate()
     {
-        Regions = GetScopes(new SnapshotSpan(_buffer.CurrentSnapshot, 0, _buffer.CurrentSnapshot.Length), _buffer.CurrentSnapshot).ToList();
+        Regions = GetScopes(new SnapshotSpan(_buffer.CurrentSnapshot, 0, _buffer.CurrentSnapshot.Length), _buffer.CurrentSnapshot).ToHashSet();
 
         Validated?.Invoke(null);
         ValidatedParser?.Invoke(this);
@@ -315,14 +320,15 @@ internal class Parser
         {
             foreach (var change in e.Changes)
             {
-                Regions.RemoveAll(e =>
+                Regions.RemoveWhere(e =>
                     e.Span.IntersectsWith(change.OldSpan) ||
                     (change.OldSpan.IsEmpty && e.Span.Contains(change.OldSpan)));
             }
 
-            for (int i = 0; i < Regions.Count; i++)
+            foreach (var region in Regions.Select(r => r).ToList())
             {
-                Regions[i] = Regions[i].TranslateTo(e.After, SpanTrackingMode.EdgeInclusive);
+                Regions.Remove(region);
+                Regions.Add(region.TranslateTo(e.After, SpanTrackingMode.EdgeInclusive));
             }
 
             if (_snapshot != null && _snapshot != e.After)
@@ -335,7 +341,7 @@ internal class Parser
             {
                 foreach (var scope in GetScopes(new SnapshotSpan(e.After, change.NewSpan), e.After))
                 {
-                    Regions.RemoveAll(r =>
+                    Regions.RemoveWhere(r =>
                         r.Span.IntersectsWith(scope) ||
                         (scope.IsEmpty && r.Span.Contains(scope)));
 

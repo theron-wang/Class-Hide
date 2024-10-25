@@ -14,7 +14,7 @@
 				<CommandFlag>DynamicVisibility</CommandFlag>
 				<CommandFlag>DefaultInvisible</CommandFlag>
 				<Strings>
-					<ButtonText>Collapse All Classes</ButtonText>
+					<ButtonText>Collapse/Uncollapse All Classes</ButtonText>
 				</Strings>
 			</Button>
 		</Buttons>

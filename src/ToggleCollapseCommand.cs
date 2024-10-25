@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace ClassHide;
 
 [Command(PackageGuids.guidVSPackageCmdSetString, PackageIds.CollapseAllCmdId)]
-internal class CollapseAllCommand : BaseCommand<CollapseAllCommand>
+internal class ToggleCollapseCommand : BaseCommand<ToggleCollapseCommand>
 {
     private static readonly string[] _contentTypes = ["html", "WebForms", "razor", "LegacyRazorCSharp", "LegacyRazor", "LegacyRazorCoreCSharp"];
 
@@ -31,7 +31,7 @@ internal class CollapseAllCommand : BaseCommand<CollapseAllCommand>
 
         var componentModel = await VS.Services.GetComponentModelAsync();
         var outliningManagerService = componentModel.GetService<IOutliningManagerService>();
-        
+
         var manager = outliningManagerService.GetOutliningManager(docView?.TextView);
 
         if (manager is null)
@@ -51,9 +51,17 @@ internal class CollapseAllCommand : BaseCommand<CollapseAllCommand>
         }
 
         var snapshot = new SnapshotSpan(docView.TextBuffer.CurrentSnapshot, 0, docView.TextBuffer.CurrentSnapshot.Length);
-        manager.CollapseAll(snapshot, collapsible =>
+
+        if (manager.GetAllRegions(snapshot)
+            .All(r =>
+                !parser.Regions.Contains(r.Extent.GetSpan(docView.TextBuffer.CurrentSnapshot)) ||
+                (r.IsCollapsible && r.IsCollapsed)))
         {
-            return parser.Regions.Contains(collapsible.Extent.GetSpan(docView.TextBuffer.CurrentSnapshot));
-        });
+            manager.ExpandAll(snapshot, c => parser.Regions.Contains(c.Extent.GetSpan(docView.TextBuffer.CurrentSnapshot)));
+        }
+        else
+        {
+            manager.CollapseAll(snapshot, c => parser.Regions.Contains(c.Extent.GetSpan(docView.TextBuffer.CurrentSnapshot)));
+        }
     }
 }
