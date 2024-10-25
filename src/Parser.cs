@@ -47,8 +47,57 @@ internal class Parser
         if (span.End != snapshot.Length && (string.IsNullOrWhiteSpace(text) || last == -1 || string.IsNullOrWhiteSpace(text.Substring(last + 1)) == false))
         {
             SnapshotPoint end = span.End;
-            while (end < snapshot.Length - 1 && endings.Contains(end.GetChar()) == false)
+
+            bool isInRazor = false;
+            int depth = 0;
+            // Number of quotes (excluding \")
+            // Odd if in string context, even if not
+            int numberOfQuotes = 0;
+            bool isEscaping = false;
+
+            while (end < snapshot.Length - 1 && (depth != 0 || numberOfQuotes % 2 == 1 || endings.Contains(end.GetChar()) == false))
             {
+                var character = end.GetChar();
+
+                if (character == '@')
+                {
+                    isInRazor = true;
+                }
+                else if (isInRazor)
+                {
+                    bool escape = isEscaping;
+                    isEscaping = false;
+
+                    if (numberOfQuotes % 2 == 1)
+                    {
+                        if (character == '\\')
+                        {
+                            isEscaping = true;
+                        }
+                    }
+                    else
+                    {
+                        if (character == '(')
+                        {
+                            depth++;
+                        }
+                        else if (character == ')')
+                        {
+                            depth--;
+                        }
+                    }
+
+                    if (character == '"' && !escape)
+                    {
+                        numberOfQuotes++;
+                    }
+
+                    if (depth == 0 && numberOfQuotes % 2 == 0 && character == ' ')
+                    {
+                        isInRazor = false;
+                    }
+                }
+
                 end += 1;
             }
 
@@ -163,11 +212,59 @@ internal class Parser
             segmentStart += 7;
             segmentEnd = segmentStart + 1;
 
+            bool isInRazor = false;
+            int depth = 0;
+            // Number of quotes (excluding \")
+            // Odd if in string context, even if not
+            int numberOfQuotes = 0;
+            bool isEscaping = false;
+
             while (segmentEnd < span.End && segmentEnd + 1 < snapshot.Length)
             {
                 segmentEnd += 1;
 
-                if (end == segmentEnd.GetChar())
+                var character = segmentEnd.GetChar();
+
+                if (character == '@')
+                {
+                    isInRazor = true;
+                }
+                else if (isInRazor)
+                {
+                    bool escape = isEscaping;
+                    isEscaping = false;
+
+                    if (numberOfQuotes % 2 == 1)
+                    {
+                        if (character == '\\')
+                        {
+                            isEscaping = true;
+                        }
+                    }
+                    else
+                    {
+                        if (character == '(')
+                        {
+                            depth++;
+                        }
+                        else if (character == ')')
+                        {
+                            depth--;
+                        }
+                    }
+
+                    if (character == '"' && !escape)
+                    {
+                        numberOfQuotes++;
+                    }
+
+                    if (depth == 0 && numberOfQuotes % 2 == 0 && character == ' ')
+                    {
+                        isInRazor = false;
+                    }
+                }
+
+                if (end == segmentEnd.GetChar() && isInRazor == false)
                 {
                     yield return new SnapshotSpan(segmentStart, segmentEnd);
 

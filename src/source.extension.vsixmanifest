@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="ClassHide.b8c18253-f0aa-43d3-af54-3906483b20ad" Version="1.0" Language="en-US" Publisher="Theron Wang" />
+        <Identity Id="ClassHide.b8c18253-f0aa-43d3-af54-3906483b20ad" Version="1.0.1" Language="en-US" Publisher="Theron Wang" />
         <DisplayName>Class Hide</DisplayName>
         <Description xml:space="preserve">This extension collapses lengthy HTML class attributes, improving code readibility.</Description>
         <MoreInfo>https://github.com/theron-wang/Class-Hide</MoreInfo>
         <Icon>Resources\logo.png</Icon>
-        <Tags>html, css, class, hide, collapse, readability, clutter, fold</Tags>
+        <Tags>html, css, class, hide, collapse, readability, clutter, fold, utility, tailwind, tailwind css</Tags>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
