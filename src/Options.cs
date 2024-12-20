@@ -42,6 +42,12 @@ public class Options : BaseOptionModel<Options>
     public int PreviewLength { get; set; } = 20;
 
     [Category("General")]
+    [DisplayName("Delimiter")]
+    [Description("Text after the first instance of this delimiter will be hidden. If the delimiter is not found, the entire class will be collapsed.")]
+    [DefaultValue("")]
+    public string Delimiter { get; set; } = "";
+
+    [Category("General")]
     [DisplayName("Preview")]
     [Description("The text to display over the truncated section")]
     [TypeConverter(typeof(EnumConverter))]

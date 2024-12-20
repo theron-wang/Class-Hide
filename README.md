@@ -24,6 +24,7 @@ Extension settings can be located under Tools > Options > Class Hide.
 - **`Minimum class length`**: The minimum text length within class=\"\" to enable collapsing
 - **`Preview`**: The text to display over the truncated section. Can be set to `Ellipses`, showing `...`, or `Truncate`, which will display a shortened version of the class attribute
 - **`Preview length`**: The maximum number of characters shown in preview when classes are hidden; only takes effect when `Preview` is set to `Truncate`
+- **`Delimiter`**: Text after the first instance of this delimiter will be hidden. If the delimiter is not found, the entire class will be collapsed.
 
 ## Bugs / Suggestions
 

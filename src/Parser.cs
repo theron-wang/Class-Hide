@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.Text;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace ClassHide;
@@ -172,7 +173,7 @@ internal class Parser
             span = new SnapshotSpan(start, span.End);
         }
 
-        var segmentStart = span.Start;
+        SnapshotPoint segmentStart;
         var segmentEnd = span.Start;
 
         text = span.GetText().ToLower();
@@ -268,14 +269,33 @@ internal class Parser
 
                 if (end == character)
                 {
-                    yield return new SnapshotSpan(segmentStart, segmentEnd);
+                    var snapshotSpan = new SnapshotSpan(segmentStart, segmentEnd);
+                    var t = snapshotSpan.GetText();
+                    if (!string.IsNullOrWhiteSpace(_options.Delimiter) && t.Contains(_options.Delimiter))
+                    {
+                        var startIndex = t.IndexOf(_options.Delimiter);
+
+                        if (startIndex + 1 < t.Length)
+                        {
+                            startIndex++;
+                        }
+                        if (startIndex + 1 < t.Length && char.IsWhiteSpace(t[startIndex + 1]))
+                        {
+                            startIndex++;
+                        }
+
+                        yield return new SnapshotSpan(segmentStart + startIndex, segmentEnd);
+                    }
+                    else
+                    {
+                        yield return snapshotSpan;
+                    }
 
                     if (segmentEnd == span.End)
                     {
                         yield break;
                     }
 
-                    segmentStart = segmentEnd + 1;
                     break;
                 }
 
