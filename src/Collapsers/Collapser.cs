@@ -1,37 +1,27 @@
-﻿using Community.VisualStudio.Toolkit;
+﻿using ClassHide.TaggerParsers;
+using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Outlining;
-using Microsoft.VisualStudio.Text.Tagging;
-using Microsoft.VisualStudio.Utilities;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 
 namespace ClassHide;
 
-[Export(typeof(ITextViewCreationListener))]
-[ContentType("html")]
-[ContentType("WebForms")]
-[ContentType("razor")]
-[ContentType("LegacyRazorCSharp")]
-[ContentType("LegacyRazor")]
-[ContentType("LegacyRazorCoreCSharp")]
-[TextViewRole(PredefinedTextViewRoles.Document)]
-[TextViewRole(PredefinedTextViewRoles.Analyzable)]
-internal class FileOpenCollapser : ITextViewCreationListener, IDisposable
+internal abstract class Collapser : ITextViewCreationListener, IDisposable
 {
     private readonly Dictionary<Parser, ITextView> _queuedParsers = [];
 
-    public void TextViewCreated(ITextView textView)
+    protected abstract Parser GetParser(ITextBuffer textBuffer);
+
+    public virtual void TextViewCreated(ITextView textView)
     {
         var options = ThreadHelper.JoinableTaskFactory.Run(Options.GetLiveInstanceAsync);
 
         if (options.AutomaticallyFold)
         {
-            var parser = textView.TextBuffer.Properties.GetOrCreateSingletonProperty(
-                () => new Parser(textView.TextBuffer));
+            var parser = textView.TextBuffer.Properties.GetOrCreateSingletonProperty(() => GetParser(textView.TextBuffer));
 
             parser.ValidatedParser += ParserValidated;
             _queuedParsers.Add(parser, textView);

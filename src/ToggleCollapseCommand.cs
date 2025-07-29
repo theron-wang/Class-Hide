@@ -1,4 +1,5 @@
-﻿using Community.VisualStudio.Toolkit;
+﻿using ClassHide.TaggerParsers;
+using Community.VisualStudio.Toolkit;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Outlining;
@@ -11,7 +12,9 @@ namespace ClassHide;
 [Command(PackageGuids.guidVSPackageCmdSetString, PackageIds.CollapseAllCmdId)]
 internal class ToggleCollapseCommand : BaseCommand<ToggleCollapseCommand>
 {
-    private static readonly string[] _contentTypes = ["html", "WebForms", "razor", "LegacyRazorCSharp", "LegacyRazor", "LegacyRazorCoreCSharp"];
+    private static readonly string[] _htmlContentTypes = ["html", "WebForms"];
+    private static readonly string[] _razorContentTypes = ["razor", "LegacyRazorCSharp", "LegacyRazor", "LegacyRazorCoreCSharp"];
+    private static readonly string[] _jsContentTypes = ["JavaScript", "TypeScript", "tsx"];
 
     protected override void BeforeQueryStatus(EventArgs e)
     {
@@ -41,9 +44,17 @@ internal class ToggleCollapseCommand : BaseCommand<ToggleCollapseCommand>
 
         Parser parser = null;
 
-        if (_contentTypes.Any(c => c.Equals(docView.TextView.TextSnapshot.ContentType.TypeName, StringComparison.InvariantCultureIgnoreCase)))
+        if (_razorContentTypes.Any(c => c.Equals(docView.TextView.TextSnapshot.ContentType.TypeName, StringComparison.InvariantCultureIgnoreCase)))
         {
-            parser = docView.TextBuffer.Properties.GetOrCreateSingletonProperty(() => new Parser(docView.TextBuffer));
+            parser = docView.TextBuffer.Properties.GetOrCreateSingletonProperty(() => new RazorTaggerParser(docView.TextBuffer));
+        }
+        else if (_htmlContentTypes.Any(c => c.Equals(docView.TextView.TextSnapshot.ContentType.TypeName, StringComparison.InvariantCultureIgnoreCase)))
+        {
+            parser = docView.TextBuffer.Properties.GetOrCreateSingletonProperty(() => new HtmlTaggerParser(docView.TextBuffer));
+        }
+        else if (_jsContentTypes.Any(c => c.Equals(docView.TextView.TextSnapshot.ContentType.TypeName, StringComparison.InvariantCultureIgnoreCase)))
+        {
+            parser = docView.TextBuffer.Properties.GetOrCreateSingletonProperty(() => new JSTaggerParser(docView.TextBuffer));
         }
         else
         {

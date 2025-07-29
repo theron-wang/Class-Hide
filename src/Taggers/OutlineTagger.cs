@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using ClassHide.TaggerParsers;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
 using System;
@@ -13,10 +14,10 @@ internal class OutlineTagger : ITagger<IOutliningRegionTag>, IDisposable
 
     public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
 
-    public OutlineTagger(ITextBuffer buffer)
+    public OutlineTagger(ITextBuffer buffer, Parser parser)
     {
         _buffer = buffer;
-        _parser = buffer.Properties.GetOrCreateSingletonProperty(() => new Parser(buffer));
+        _parser = parser;
         _parser.Validated += UpdateRegions;
     }
 
@@ -61,7 +62,7 @@ internal class OutlineTagger : ITagger<IOutliningRegionTag>, IDisposable
 
         if (_parser.Regions.Any() && _parser.Regions.First().Snapshot != span.Snapshot)
         {
-            foreach (var scope in _parser.GetScopes(span, span.Snapshot))
+            foreach (var scope in _parser.GetScopes(span))
             {
                 if (scope.Length < options.MinimumClassLength)
                 {

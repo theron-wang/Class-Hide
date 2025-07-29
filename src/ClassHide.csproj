@@ -47,28 +47,39 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Collapsers\Collapser.cs" />
+    <Compile Include="Collapsers\RazorCollapser.cs" />
+    <Compile Include="Collapsers\JSCollapser.cs" />
+    <Compile Include="LegacyRazorEditorHelper.cs" />
+    <Compile Include="source.extension.cs" />
+    <Compile Include="TaggerParsers\RazorTaggerParser.cs" />
+    <Compile Include="TaggerParsers\JSTaggerParser.cs" />
+    <Compile Include="TaggerParsers\HtmlTaggerParser.cs" />
+    <Compile Include="Parsers\ClassRegexHelper.cs" />
+    <Compile Include="Parsers\HtmlParser.cs" />
+    <Compile Include="Parsers\JSParser.cs" />
+    <Compile Include="Parsers\RazorParser.cs" />
+    <Compile Include="Taggers\JSOutlineTaggerProvider.cs" />
+    <Compile Include="Taggers\RazorOutlineTaggerProvider.cs" />
     <Compile Include="ToggleCollapseCommand.cs" />
-    <Compile Include="FileOpenCollapser.cs" />
+    <Compile Include="Collapsers\HtmlCollapser.cs" />
     <Compile Include="CommandTable.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>CommandTable.vsct</DependentUpon>
     </Compile>
     <Compile Include="Options.cs" />
-    <Compile Include="OutlineTagger.cs" />
-    <Compile Include="OutlineTaggerProvider.cs" />
-    <Compile Include="Parser.cs" />
+    <Compile Include="Taggers\OutlineTagger.cs" />
+    <Compile Include="Taggers\HtmlOutlineTaggerProvider.cs" />
+    <Compile Include="TaggerParsers\Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ClassHidePackage.cs" />
-    <Compile Include="source.extension.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>source.extension.vsixmanifest</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
+      <Generator>VsixManifestGenerator</Generator>
+      <LastGenOutput>source.extension1.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

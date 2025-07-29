@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Text;
+﻿using ClassHide.TaggerParsers;
+using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.Utilities;
@@ -8,18 +9,17 @@ namespace ClassHide;
 
 [Export(typeof(ITaggerProvider))]
 [TagType(typeof(IOutliningRegionTag))]
-[ContentType("html")]
-[ContentType("WebForms")]
-[ContentType("razor")]
-[ContentType("LegacyRazorCSharp")]
-[ContentType("LegacyRazor")]
-[ContentType("LegacyRazorCoreCSharp")]
+[ContentType("JavaScript")]
+[ContentType("TypeScript")]
+[ContentType("jsx")]
 [TextViewRole(PredefinedTextViewRoles.Document)]
 [TextViewRole(PredefinedTextViewRoles.Analyzable)]
-public class OutlineTaggerProvider : ITaggerProvider
+public class JSOutlineTaggerProvider : ITaggerProvider
 {
     public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
     {
-        return buffer.Properties.GetOrCreateSingletonProperty(() => new OutlineTagger(buffer)) as ITagger<T>;
+        var parser = buffer.Properties.GetOrCreateSingletonProperty<Parser>(() => new JSTaggerParser(buffer));
+
+        return buffer.Properties.GetOrCreateSingletonProperty(() => new OutlineTagger(buffer, parser)) as ITagger<T>;
     }
 }
